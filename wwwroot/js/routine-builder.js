@@ -9,9 +9,23 @@ export const RoutineBuilder = {
 
     setupImportFunctionality(state) {
         DOM.importSheetBtn.addEventListener('click', () => {
-            // Load saved URL and range from localStorage
-            const savedSheetUrl = localStorage.getItem('lastSheetUrl') || '';
-            const savedSheetRange = localStorage.getItem('lastSheetRange') || '';
+            // Load saved URL and range for the selected routine (per-routine),
+            // fall back to global last values in localStorage for unsaved/new routines.
+            let savedSheetUrl = '';
+            let savedSheetRange = '';
+
+            if (state.selectedRoutineIndex >= 0 && state.savedRoutines[state.selectedRoutineIndex]) {
+                const saved = state.savedRoutines[state.selectedRoutineIndex];
+                savedSheetUrl = saved.lastSheetUrl || '';
+                savedSheetRange = saved.lastSheetRange || '';
+            }
+
+            if (!savedSheetUrl) {
+                savedSheetUrl = localStorage.getItem('lastSheetUrl') || '';
+            }
+            if (!savedSheetRange) {
+                savedSheetRange = localStorage.getItem('lastSheetRange') || '';
+            }
 
             DOM.sheetUrlInput.value = savedSheetUrl;
             DOM.sheetRangeInput.value = savedSheetRange;
@@ -35,7 +49,7 @@ export const RoutineBuilder = {
             return;
         }
 
-        // Save to localStorage for future use
+        // Keep a global fallback in localStorage for convenience (unsaved/new routines)
         localStorage.setItem('lastSheetUrl', baseUrl);
         localStorage.setItem('lastSheetRange', range);
 
@@ -81,6 +95,17 @@ export const RoutineBuilder = {
                 state.routine = newRoutine;
             } else {
                 state.routine = [...state.routine, ...newRoutine];
+            }
+
+            // Persist last-import metadata per saved routine when editing a saved routine
+            if (state.selectedRoutineIndex >= 0 && state.savedRoutines[state.selectedRoutineIndex]) {
+                const sr = state.savedRoutines[state.selectedRoutineIndex];
+                sr.lastSheetUrl = baseUrl;
+                sr.lastSheetRange = range;
+                // persist savedRoutines
+                localStorage.setItem('savedRoutines', JSON.stringify(state.savedRoutines));
+            } else {
+                // For new/unsaved routines we already stored the global fallback above
             }
 
             this.fullRenderRoutine(state);
@@ -685,9 +710,24 @@ export const RoutineBuilder = {
 
         const name = DOM.workoutNameInput.value || 'Unnamed Routine';
 
+        // Determine lastSheetUrl/lastSheetRange to store with this routine
+        let lastSheetUrl = '';
+        let lastSheetRange = '';
+
+        if (state.selectedRoutineIndex >= 0 && state.savedRoutines[state.selectedRoutineIndex]) {
+            const existing = state.savedRoutines[state.selectedRoutineIndex];
+            lastSheetUrl = existing.lastSheetUrl || DOM.sheetUrlInput.value.trim() || localStorage.getItem('lastSheetUrl') || '';
+            lastSheetRange = existing.lastSheetRange || DOM.sheetRangeInput.value.trim() || localStorage.getItem('lastSheetRange') || '';
+        } else {
+            lastSheetUrl = DOM.sheetUrlInput.value.trim() || localStorage.getItem('lastSheetUrl') || '';
+            lastSheetRange = DOM.sheetRangeInput.value.trim() || localStorage.getItem('lastSheetRange') || '';
+        }
+
         const routineData = {
             name,
-            items: JSON.parse(JSON.stringify(state.routine))
+            items: JSON.parse(JSON.stringify(state.routine)),
+            lastSheetUrl,
+            lastSheetRange
         };
 
         // Check if we're editing an existing routine
@@ -909,7 +949,7 @@ export const RoutineBuilder = {
         });
 
         // Mode switching
-        DOM.exerciseModeSelect.addEventListener('change', function () {
+        DOM.exerciseModeSelect.addEventListener('change', function() {
             if (this.value === 'reps') {
                 DOM.repsContainer.classList.remove('d-none');
                 DOM.timeContainer.classList.add('d-none');
@@ -921,7 +961,7 @@ export const RoutineBuilder = {
 
         // Color selection
         document.querySelectorAll('.color-option').forEach(option => {
-            option.addEventListener('click', function () {
+            option.addEventListener('click', function() {
                 document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
                 this.classList.add('selected');
                 document.getElementById('exercise-color').value = this.dataset.color;
