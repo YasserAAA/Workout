@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\Versions\**" />
+    <Content Remove="wwwroot\Versions\**" />
+    <EmbeddedResource Remove="wwwroot\Versions\**" />
+    <None Remove="wwwroot\Versions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="compilerconfig.json" />
+    <Content Remove="wwwroot\index.html" />
+    <Content Remove="wwwroot\js\app.js" />
+    <Content Remove="wwwroot\js\audio.js" />
+    <Content Remove="wwwroot\js\audio3.js" />
+    <Content Remove="wwwroot\js\dom-elements.js" />
+    <Content Remove="wwwroot\js\routine-builder.js" />
+    <Content Remove="wwwroot\js\state.js" />
+    <Content Remove="wwwroot\js\timer.js" />
+    <Content Remove="wwwroot\js\utils.js" />
+    <Content Remove="wwwroot\js\workout.js" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="compilerconfig.json" />
+    <None Include="wwwroot\index.html" />
+    <None Include="wwwroot\js\app.js" />
+    <None Include="wwwroot\js\audio.js" />
+    <None Include="wwwroot\js\audio3.js" />
+    <None Include="wwwroot\js\dom-elements.js" />
+    <None Include="wwwroot\js\routine-builder.js" />
+    <None Include="wwwroot\js\state.js" />
+    <None Include="wwwroot\js\timer.js" />
+    <None Include="wwwroot\js\utils.js" />
+    <None Include="wwwroot\js\workout.js" />
+  </ItemGroup>
+
+</Project>

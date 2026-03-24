@@ -1,0 +1,10 @@
+﻿[
+  {
+    "outputFile": "wwwroot/style.css",
+    "inputFile": "wwwroot/style.scss"
+  },
+  {
+    "outputFile": "wwwroot/grok/style.css",
+    "inputFile": "wwwroot/grok/style.scss"
+  }
+]
