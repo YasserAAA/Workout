@@ -235,6 +235,10 @@ body {
 .badge-reps {
     background: var(--warning);
     color: #000;
+    padding: 7px 22px 10px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    line-height: 1.2rem;
 }
 
 .badge-time {
@@ -645,5 +649,23 @@ body {
 
     .current-exercise {
         opacity: 0.8;
+    }
+}
+
+#saved-routines-list .routine-card {
+    cursor: grab;
+    transition: opacity 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    &.dragging {
+        opacity: 0.45;
+    }
+
+    &.drag-over {
+        border-color: var(--bs-primary);
+        transform: translateY(-2px);
     }
 }

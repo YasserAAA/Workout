@@ -25,7 +25,7 @@ class GymTimerApp {
         RoutineBuilder.renderRoutine(this.state);
         RoutineBuilder.updateSavedRoutinesList(this.state);
         AudioPlayer.init(); 
-        VisibilityHandler.init(this.state);
+        VisibilityHandler.init(this.state, false /* timerInterruptionEnabled */);
         PWA.init(this.state); 
         this.setupNetworkDetection();
         this.displayVersion();

@@ -727,7 +727,8 @@ export const RoutineBuilder = {
             name,
             items: JSON.parse(JSON.stringify(state.routine)),
             lastSheetUrl,
-            lastSheetRange
+            lastSheetRange,
+            lastTotalTime: state.savedRoutines[state.selectedRoutineIndex]?.lastTotalTime || ''
         };
 
         // Check if we're editing an existing routine
@@ -755,12 +756,16 @@ export const RoutineBuilder = {
 
         DOM.savedCount.textContent = state.savedRoutines.length;
         DOM.savedRoutinesList.innerHTML = '';
+        let draggedCard = null;
         state.savedRoutines.forEach((routine, index) => {
             const div = document.createElement('div');
             div.className = 'routine-card';
+            div.draggable = true;
+            div.dataset.routineIndex = index;
             div.innerHTML = `
             <div class="d-flex justify-content-between align-items-center">
                 <h5>${routine.name}</h5>
+                <span class="routine-last-time badge bg-success fs-5">${routine.lastTotalTime || '--:--:--'}</span>
                 <span class="badge bg-primary">${routine.items.length} items</span>
             </div>
             <div class="mt-2">
@@ -807,15 +812,75 @@ export const RoutineBuilder = {
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (confirm(`Are you sure you want to delete "${routine.name}"?`)) {
+                    const selectedRoutine = state.savedRoutines[state.selectedRoutineIndex];
                     state.savedRoutines.splice(index, 1);
+                    state.selectedRoutineIndex = selectedRoutine === routine
+                        ? -1
+                        : selectedRoutine ? state.savedRoutines.indexOf(selectedRoutine) : -1;
                     localStorage.setItem('savedRoutines', JSON.stringify(state.savedRoutines));
                     this.updateSavedRoutinesList(state);
                     Utils.showAlert(`Routine "${routine.name}" deleted`, 'danger');
-
-                    if (state.selectedRoutineIndex === index) {
-                        state.selectedRoutineIndex = -1;
-                    }
                 }
+            });
+
+            div.addEventListener('dragstart', (e) => {
+                if (e.target.closest('button')) {
+                    e.preventDefault();
+                    return;
+                }
+
+                draggedCard = div;
+                div.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', div.dataset.routineIndex);
+            });
+
+            div.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            div.addEventListener('dragenter', () => {
+                if (draggedCard && draggedCard !== div) {
+                    div.classList.add('drag-over');
+                }
+            });
+
+            div.addEventListener('dragleave', (e) => {
+                if (!div.contains(e.relatedTarget)) {
+                    div.classList.remove('drag-over');
+                }
+            });
+
+            div.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                div.classList.remove('drag-over');
+
+                if (!draggedCard || draggedCard === div) {
+                    return;
+                }
+
+                const fromIndex = Number(draggedCard.dataset.routineIndex);
+                const toIndex = Number(div.dataset.routineIndex);
+                if (fromIndex < 0 || fromIndex >= state.savedRoutines.length || toIndex < 0 || toIndex >= state.savedRoutines.length) {
+                    return;
+                }
+
+                const selectedRoutine = state.savedRoutines[state.selectedRoutineIndex];
+                const [routine] = state.savedRoutines.splice(fromIndex, 1);
+                state.savedRoutines.splice(toIndex, 0, routine);
+                state.selectedRoutineIndex = selectedRoutine ? state.savedRoutines.indexOf(selectedRoutine) : -1;
+
+                localStorage.setItem('savedRoutines', JSON.stringify(state.savedRoutines));
+                this.updateSavedRoutinesList(state);
+            });
+
+            div.addEventListener('dragend', () => {
+                draggedCard = null;
+                DOM.savedRoutinesList.querySelectorAll('.routine-card').forEach(card => {
+                    card.classList.remove('dragging', 'drag-over');
+                });
             });
 
             DOM.savedRoutinesList.appendChild(div);

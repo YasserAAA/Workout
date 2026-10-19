@@ -1,0 +1,12 @@
+{
+  "root": "/wwwroot",
+  "modules": [
+    {
+      "source": [
+        "/style.scss"
+      ],
+      "output": "/style.min.css",
+      "emitPlaceholder": true
+    }
+  ]
+}

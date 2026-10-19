@@ -3,6 +3,7 @@ import { DOM } from './dom-elements.js';
 import { Utils } from './utils.js';
 import { Timer } from './timer.js';
 import { WorkoutTimer } from './workout-timer.js';
+import { RoutineBuilder } from './routine-builder.js';
 
 export const Workout = {
     startCurrentItem(state) {
@@ -217,6 +218,13 @@ export const Workout = {
         const seconds = Math.floor((totalWorkoutTime % 60000) / 1000);
 
         DOM.totalTimeDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        const selectedRoutine = state.savedRoutines[state.selectedRoutineIndex];
+        if (selectedRoutine) {
+            selectedRoutine.lastTotalTime = DOM.totalTimeDisplay.textContent;
+            localStorage.setItem('savedRoutines', JSON.stringify(state.savedRoutines));
+            RoutineBuilder.updateSavedRoutinesList(state);
+        }
 
         DOM.timerView.classList.add('hidden');
         DOM.finishScreen.classList.remove('hidden');

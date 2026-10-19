@@ -4,9 +4,12 @@ import { Timer } from './timer.js';
 import { WorkoutTimer } from './workout-timer.js';
 
 export const VisibilityHandler = {
-    init(state) {
+    init(state, enabled) {
         this.state = state;
-        this.setupEventListeners();
+        this.enabled = enabled;
+        if (this.enabled) {
+            this.setupEventListeners();
+        }
     },
 
     setupEventListeners() {
