@@ -1,5 +1,5 @@
 ﻿// sw.js
-const APP_VERSION = 'v17'; // UPDATE THIS WITH EACH DEPLOYMENT
+const APP_VERSION = 'v18'; // UPDATE THIS WITH EACH DEPLOYMENT
 const CACHE_NAME = `gym-timer-${APP_VERSION}`;
 
 // URLs to cache with version parameter

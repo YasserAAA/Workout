@@ -768,7 +768,7 @@ export const RoutineBuilder = {
                 <span class="routine-last-time badge bg-success fs-5">${routine.lastTotalTime || '--:--:--'}</span>
                 <span class="badge bg-primary">${routine.items.length} items</span>
             </div>
-            <div class="mt-2">
+            <div class="d-flex mt-2">
                 <button class="btn btn-sm btn-outline-success select-btn me-2">
                     <i class="fas fa-play me-1"></i>Start
                 </button>
